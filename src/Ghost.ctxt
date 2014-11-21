@@ -1,0 +1,13 @@
+#BlueJ class context
+comment0.params=pakman
+comment0.target=Ghost(PaKman)
+comment1.params=
+comment1.target=void\ reset()
+comment1.text=\n\ Called\ when\ the\ level\ is\ initialized\ or\ reset.\n
+comment2.params=
+comment2.target=void\ act()
+comment2.text=\n\ Called\ once\ in\ every\ iteration\ of\ the\ game\ loop\ to\ calculate\ the\ actions\n\ of\ this\ ghost.\n
+comment3.params=
+comment3.target=void\ toggleHunting()
+comment3.text=\n\ Toggle\ hunting/fleeing\ mode.\n
+numComments=4
