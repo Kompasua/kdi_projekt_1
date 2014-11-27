@@ -8,13 +8,14 @@ import java.util.Random;
 
 import ch.aplu.jgamegrid.Actor;
 import ch.aplu.jgamegrid.Location;
+import ch.aplu.jgamegrid.Location.CompassDirection;
 
 public class Ghost extends Actor
 {
     private PaKman pakman;
     private Location last;
     boolean first = true;
-
+    
     public Ghost(PaKman pakman)
     {
         super(false, "sprites/ghost.gif", 2);
@@ -35,7 +36,7 @@ public class Ghost extends Actor
      */
     public void act()
     {	 
-    	
+    	//moveGhost();
     	if (first == true){
     		goRandom();
     		first = false;
@@ -52,14 +53,17 @@ public class Ghost extends Actor
             turn(180);
     }
     /**
-     * Check by color if cell available for move of ghost. Ghost is moving only on lightGray cells.   
+     * Check if cell is available for move of ghost.  
      * @param location where ghost would like to move
-     * @return true if sell is lightGray, false if not
+     * @return true if sell is PASSAGE, false if WALL
      */
     private boolean canMove(Location location)
     {
-    	Color c = getBackground().getColor(location);
-    	return (c.equals(Color.lightGray));
+    	Tile cell = pakman.getLevel().getTile(location);
+    	if (cell == Tile.PASSAGE){
+    		return true;
+    	}
+    	return false;
     }
     
     private void nextStep(){
