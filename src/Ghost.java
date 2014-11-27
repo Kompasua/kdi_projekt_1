@@ -16,8 +16,7 @@ public class Ghost extends Actor
     private Location last;
     boolean first = true;
     
-    public Ghost(PaKman pakman)
-    {
+    public Ghost(PaKman pakman) {
         super(false, "sprites/ghost.gif", 2);
         this.pakman = pakman;
         reset();
@@ -34,9 +33,7 @@ public class Ghost extends Actor
      * Called once in every iteration of the game loop to calculate the actions
      * of this ghost.
      */
-    public void act()
-    {	 
-    	//moveGhost();
+    public void act() {
     	if (first == true){
     		goRandom();
     		first = false;
@@ -52,13 +49,13 @@ public class Ghost extends Actor
         if (!isMoveValid())
             turn(180);
     }
+    
     /**
      * Check if cell is available for move of ghost.  
      * @param location where ghost would like to move
      * @return true if sell is PASSAGE, false if WALL
      */
-    private boolean canMove(Location location)
-    {
+    private boolean canMove(Location location) {
     	Tile cell = pakman.getLevel().getTile(location);
     	if (cell == Tile.PASSAGE){
     		return true;
@@ -67,69 +64,27 @@ public class Ghost extends Actor
     }
     
     private void nextStep(){
-    	System.out.println("NO random");
-    	Location east = getLocation().getNeighbourLocation(Location.EAST);
-    	Location west = getLocation().getNeighbourLocation(Location.WEST);
-    	Location north = getLocation().getNeighbourLocation(Location.NORTH);
-    	Location south = getLocation().getNeighbourLocation(Location.SOUTH);
     	Location next = getLocation().getNeighbourLocation(last.getDirectionTo(getLocation()));
+    	//Debug block
     	System.out.println("Last: "+last.toString());
     	System.out.println("Now: "+getLocation());
     	System.out.println("Next: "+next.toString());
-    	if (next != null && canMove(next))
-        {
+    	
+    	if (next != null && canMove(next)) {
     		if (lookAround().size() > 2){
-    			System.out.println(lookAround().toString());
+    			System.out.println(lookAround().toString()); //DELETE
     			goRandom();
     		}else{
     			setLocation(next);
     	        gameGrid.refresh();
+    	        System.out.println("NO random"); //DELETE
     		}
         }else{
         	goRandom();
         }
-    	//setLocation(east);
-    	//System.out.println(last.toString());
-    	//System.out.println(next.toString());
-    	//System.out.println(getLocation());
-    	/*System.out.println((int)last.getDirectionTo(getLocation()));
-    	switch((int)last.getDirectionTo(getLocation())){
-    	case 0:
-    		if (east != null && canMove(east))
-            {
-    			last = getLocation();
-              setLocation(east);
-              gameGrid.refresh();
-            }else{
-            	goRandom();
-            }
-    	case 90:
-    		if (south != null && canMove(south))
-            {
-              setLocation(south);
-              gameGrid.refresh();
-            }else{
-            	goRandom();
-            }
-    	case 180:
-    		if (west != null && canMove(west))
-            {
-    			last = getLocation();
-              setLocation(west);
-              gameGrid.refresh();
-            }else{
-            	goRandom();
-            }
-    		
-    	}*/
-    	/*if (east != null && canMove(east))
-        {
-          setLocation(east);
-          gameGrid.refresh();
-        }*/
-    	
     }
-    private ArrayList lookAround(){
+    
+    private ArrayList<Location> lookAround(){
     	Location east = getLocation().getNeighbourLocation(Location.EAST);
     	Location west = getLocation().getNeighbourLocation(Location.WEST);
     	Location north = getLocation().getNeighbourLocation(Location.NORTH);
@@ -146,6 +101,7 @@ public class Ghost extends Actor
     		directions.add(south);
     	return directions;
     }
+    
     private void goRandom(){
     	System.out.println("Random");
     	
