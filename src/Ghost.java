@@ -1,8 +1,6 @@
 // Ghost.java
 // Used for PaKman
 
-import java.awt.Color;
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -14,6 +12,8 @@ public class Ghost extends Actor
 {
     private PaKman pakman;
     private Location last = null; //Previous location of ghost
+    private Level level = null; 
+    private Location locsize = null;
     //Current direction of ghost movement. Based on previous and current locations
     private double direction = 0;
     Random generator = new Random();
@@ -21,6 +21,8 @@ public class Ghost extends Actor
     public Ghost(PaKman pakman) {
         super(false, "sprites/ghost.gif", 2);
         this.pakman = pakman;
+        level = pakman.getLevel();
+        locsize = level.getSize();
         reset();
     }
     
@@ -37,15 +39,11 @@ public class Ghost extends Actor
      */
     public void act() {
     	nextStep();
-    	
     	// When moving westwards, mirror the sprite so it looks in the proper direction
-        if (getDirection() > 150 && getDirection() < 210)
+    	if (direction > 150 && direction < 210)
             setHorzMirror(false);
         else
             setHorzMirror(true);
-        //If end of the map and move is impossible, then turn over
-        if (!isMoveValid())
-            turn(180);
     }
     
     /**
@@ -54,9 +52,13 @@ public class Ghost extends Actor
      * @return true if sell is PASSAGE, false if WALL
      */
     private boolean canMove(Location location) {
-    	Tile cell = pakman.getLevel().getTile(location);
-    	if (cell == Tile.PASSAGE){
-    		return true;
+    	//Check if this location not out of maze
+    	if (location.getY() < locsize.getY() && location.getX() < locsize.getX() &&
+    		location.getY() >=0 && location.getX() >= 0){
+	    	Tile cell = pakman.getLevel().getTile(location);
+	    	if (cell == Tile.PASSAGE){
+	    		return true;
+	    	}
     	}
     	return false;
     }
