@@ -13,8 +13,10 @@ import ch.aplu.jgamegrid.Location.CompassDirection;
 public class Ghost extends Actor
 {
     private PaKman pakman;
-    private Location last;
-    boolean first = true;
+    private Location last = null; //Previous location of ghost
+    //Current direction of ghost movement. Based on previous and current locations
+    private double direction = 0;
+    Random generator = new Random();
     
     public Ghost(PaKman pakman) {
         super(false, "sprites/ghost.gif", 2);
@@ -34,12 +36,8 @@ public class Ghost extends Actor
      * of this ghost.
      */
     public void act() {
-    	if (first == true){
-    		goRandom();
-    		first = false;
-    	}else{
-    		nextStep();
-    	}
+    	nextStep();
+    	
     	// When moving westwards, mirror the sprite so it looks in the proper direction
         if (getDirection() > 150 && getDirection() < 210)
             setHorzMirror(false);
@@ -64,9 +62,8 @@ public class Ghost extends Actor
     }
     
     private void nextStep(){
-    	Location next = getLocation().getNeighbourLocation(last.getDirectionTo(getLocation()));
+    	Location next = getLocation().getNeighbourLocation(direction);
     	//Debug block
-    	System.out.println("Last: "+last.toString());
     	System.out.println("Now: "+getLocation());
     	System.out.println("Next: "+next.toString());
     	
@@ -75,7 +72,10 @@ public class Ghost extends Actor
     			System.out.println(lookAround().toString()); //DELETE
     			goRandom();
     		}else{
+    			last = getLocation();
     			setLocation(next);
+    			//Actually must be the same, because we moving in the same direction. Delete after prove. 
+    			direction = last.getDirectionTo(getLocation()); 
     	        gameGrid.refresh();
     	        System.out.println("NO random"); //DELETE
     		}
@@ -103,12 +103,12 @@ public class Ghost extends Actor
     }
     
     private void goRandom(){
-    	System.out.println("Random");
-    	
-    	Random generator = new Random(); 
+    	System.out.println("Random"); //DELETE
+    	 
     	int i = generator.nextInt(lookAround().size());
-    	setLocation((Location) lookAround().get(i));
     	last = getLocation();
+    	setLocation((Location) lookAround().get(i));
+    	direction = last.getDirectionTo(getLocation()); 
     	gameGrid.refresh();
     }
     
