@@ -6,7 +6,6 @@ import java.util.Random;
 
 import ch.aplu.jgamegrid.Actor;
 import ch.aplu.jgamegrid.Location;
-import ch.aplu.jgamegrid.Location.CompassDirection;
 
 public class Ghost extends Actor
 {
@@ -14,6 +13,7 @@ public class Ghost extends Actor
     private Location last = null; //Previous location of ghost
     private Level level = null; 
     private Location locsize = null;
+    private int random = 0;
     //Current direction of ghost movement. Based on previous and current locations
     private double direction = 0;
     Random generator = new Random();
@@ -38,7 +38,7 @@ public class Ghost extends Actor
      * of this ghost.
      */
     public void act() {
-    	nextStep();
+    	nextStepHunt();
     	// When moving westwards, mirror the sprite so it looks in the proper direction
     	if (direction > 150 && direction < 210)
             setHorzMirror(false);
@@ -63,55 +63,111 @@ public class Ghost extends Actor
     	return false;
     }
     
-    private void nextStep(){
-    	Location next = getLocation().getNeighbourLocation(direction);
-    	//Debug block
-    	System.out.println("Now: "+getLocation());
-    	System.out.println("Next: "+next.toString());
-    	
-    	if (next != null && canMove(next)) {
-    		if (lookAround().size() > 2){
-    			System.out.println(lookAround().toString()); //DELETE
-    			goRandom();
-    		}else{
-    			last = getLocation();
-    			setLocation(next);
-    			//Actually must be the same, because we moving in the same direction. Delete after prove. 
-    			direction = last.getDirectionTo(getLocation()); 
-    	        gameGrid.refresh();
-    	        System.out.println("NO random"); //DELETE
-    		}
-        }else{
+    private boolean canMove(double dir) {
+    	Location location = getLocation().getNeighbourLocation(dir);
+    	//Check if this location not out of maze
+    	if (location.getY() < locsize.getY() && location.getX() < locsize.getX() &&
+    		location.getY() >=0 && location.getX() >= 0){
+	    	Tile cell = pakman.getLevel().getTile(location);
+	    	if (cell == Tile.PASSAGE){
+	    		return true;
+	    	}
+    	}
+    	return false;
+    }
+    
+    private void makeStep(double _direction){
+    	Location next = getLocation().getNeighbourLocation(_direction);
+		if (next != null && canMove(next) && random == 0) {
+    		last = getLocation();
+    		setLocation(next);
+    		//Actually must be the same, because we moving in the same direction. Delete after prove. 
+    		direction = last.getDirectionTo(getLocation()); 
+    	    gameGrid.refresh();
+    	}else{
         	goRandom();
         }
     }
     
-    private ArrayList<Location> lookAround(){
-    	Location east = getLocation().getNeighbourLocation(Location.EAST);
-    	Location west = getLocation().getNeighbourLocation(Location.WEST);
-    	Location north = getLocation().getNeighbourLocation(Location.NORTH);
-    	Location south = getLocation().getNeighbourLocation(Location.SOUTH);
-    	
-    	ArrayList<Location> directions = new ArrayList<Location>();
-    	if (canMove(east))
-    		directions.add(east);
-    	if (canMove(west))
-    		directions.add(west);
-    	if (canMove(north))
-    		directions.add(north);
-    	if (canMove(south))
-    		directions.add(south);
+    private void nextStepHunt(){
+    	double pakmanLoc = getLocation().getDirectionTo(pakman.wherePakman()); //Pakman location in this step 
+    	if (pakmanLoc > 45 && pakmanLoc < 135){
+    		makeStep(90);
+    		return;
+    	}
+    	if (pakmanLoc > 135 && pakmanLoc < 225){
+    		makeStep(180);
+    		return;
+    	}
+    	if (pakmanLoc > 225 && pakmanLoc < 315){
+    		makeStep(270);
+    		return;
+    	}
+    	if ( (pakmanLoc > 315 && pakmanLoc < 360) || (pakmanLoc > 0 && pakmanLoc < 45) ){
+    		makeStep(0);
+    		return;
+    	}
+    	goRandom();
+    }
+        
+    private double dirStabilizer(double direction){
+    	if (direction < 0)
+    		return 360 - direction*(-1);
+    	if (direction == 360)
+    		return 0;
+    	return direction;
+    }
+    
+    private ArrayList<Double> getNextSteps(){
+    	ArrayList<Double> directions = new ArrayList<Double>();
+    	if (canMove(direction)){
+    		directions.add(direction);
+    	}
+    	if (canMove( dirStabilizer(direction+90) )){
+    		directions.add(dirStabilizer(direction+90));
+    	}
+    	if (canMove( dirStabilizer(direction-90) )){
+    		directions.add(dirStabilizer(direction-90));
+    	}
+    	if (directions.size() == 0 && canMove( dirStabilizer(direction-180) )){
+    		directions.add( dirStabilizer(direction-180) );
+    		return directions;
+    	}
     	return directions;
     }
     
     private void goRandom(){
-    	System.out.println("Random"); //DELETE
-    	 
-    	int i = generator.nextInt(lookAround().size());
-    	last = getLocation();
-    	setLocation((Location) lookAround().get(i));
-    	direction = last.getDirectionTo(getLocation()); 
-    	gameGrid.refresh();
+    	if (random == 0){
+    		random = 10;
+    	}else{
+    		random--;
+    		Location next = getLocation().getNeighbourLocation(direction);
+    		Location right = getLocation().getNeighbourLocation(direction+90);
+    		Location left = getLocation().getNeighbourLocation(direction-90);
+    		ArrayList<Double> directions = getNextSteps();
+    		int variants = directions.size();
+    		int i = generator.nextInt(variants);
+    		last = getLocation();
+    		
+    		if (variants == 3){
+    			i = generator.nextInt(variants+1);
+    			switch (i){
+    			case 0: setLocation( getLocation().getNeighbourLocation(directions.get(1)) );
+    			break;
+    			case 1: setLocation( getLocation().getNeighbourLocation(directions.get(2)) );
+    			break;
+    			default: setLocation( getLocation().getNeighbourLocation(directions.get(0)) );
+    			}
+    		}else{
+    			switch (i){
+    			case 0: setLocation( getLocation().getNeighbourLocation(directions.get(0)) );
+    			break;
+    			case 1: setLocation( getLocation().getNeighbourLocation(directions.get(1)) );
+    			}
+    		}
+	    	direction = last.getDirectionTo(getLocation()); 
+	    	gameGrid.refresh();
+    	}
     }
     
     /**
