@@ -14,6 +14,7 @@ public class Ghost extends Actor
     private Level level = null; 
     private Location locsize = null;
     private int random = 0;
+    private int mode = 0;
     //Current direction of ghost movement. Based on previous and current locations
     private double direction = 0;
     Random generator = new Random();
@@ -48,23 +49,11 @@ public class Ghost extends Actor
     
     /**
      * Check if cell is available for move of ghost.  
-     * @param location where ghost would like to move
+     * @param direction to near location where ghost would like to move
      * @return true if sell is PASSAGE, false if WALL
      */
-    private boolean canMove(Location location) {
-    	//Check if this location not out of maze
-    	if (location.getY() < locsize.getY() && location.getX() < locsize.getX() &&
-    		location.getY() >=0 && location.getX() >= 0){
-	    	Tile cell = pakman.getLevel().getTile(location);
-	    	if (cell == Tile.PASSAGE){
-	    		return true;
-	    	}
-    	}
-    	return false;
-    }
-    
     private boolean canMove(double dir) {
-    	Location location = getLocation().getNeighbourLocation(dir);
+    	Location location = getLocation().getNeighbourLocation(dirStabilizer(dir));
     	//Check if this location not out of maze
     	if (location.getY() < locsize.getY() && location.getX() < locsize.getX() &&
     		location.getY() >=0 && location.getX() >= 0){
@@ -77,10 +66,12 @@ public class Ghost extends Actor
     }
     
     private void makeStep(double _direction){
-    	Location next = getLocation().getNeighbourLocation(_direction);
-		if (next != null && canMove(next) && random == 0) {
+    	Location next = getLocation().getNeighbourLocation(dirStabilizer(_direction));
+		if (next != null && canMove(dirStabilizer(_direction)) && random == 0) {
     		last = getLocation();
     		setLocation(next);
+    		//Seems it the same, but it is not. 
+    		direction = last.getDirectionTo(getLocation());
     	    gameGrid.refresh();
     	}else{
         	goRandom();
@@ -90,23 +81,23 @@ public class Ghost extends Actor
     private void nextStepHunt(){
     	double pakmanLoc = getLocation().getDirectionTo(pakman.wherePakman()); //Pakman location in this step 
     	if (pakmanLoc > 45 && pakmanLoc < 135){
-    		makeStep(90);
+    		makeStep(90-mode);
     		return;
     	}
     	if (pakmanLoc > 135 && pakmanLoc < 225){
-    		makeStep(180);
+    		makeStep(180-mode);
     		return;
     	}
     	if (pakmanLoc > 225 && pakmanLoc < 315){
-    		makeStep(270);
+    		makeStep(270-mode);
     		return;
     	}
     	if ( (pakmanLoc > 315 && pakmanLoc < 360) || (pakmanLoc > 0 && pakmanLoc < 45) ){
-    		makeStep(0);
+    		makeStep(0-mode);
     		return;
     	}
-    	if (canMove(direction)){
-    		makeStep(direction);
+    	if (canMove(direction-mode)){
+    		makeStep(direction-mode);
     		return;
     	}
     	if (random == 0)
@@ -119,21 +110,23 @@ public class Ghost extends Actor
     		return 360 - direction*(-1);
     	if (direction == 360)
     		return 0;
+    	if (direction > 360)
+    		return direction - 360;
     	return direction;
     }
     
     private ArrayList<Double> getNextSteps(){
     	ArrayList<Double> directions = new ArrayList<Double>();
-    	if (canMove(direction)){
-    		directions.add(direction);
+    	if (canMove( direction) ){
+    		directions.add( dirStabilizer(direction) );
     	}
-    	if (canMove( dirStabilizer(direction+90) )){
+    	if (canMove(  direction+90) ){
     		directions.add(dirStabilizer(direction+90));
     	}
-    	if (canMove( dirStabilizer(direction-90) )){
+    	if (canMove( direction-90) ){
     		directions.add(dirStabilizer(direction-90));
     	}
-    	if (directions.size() == 0 && canMove( dirStabilizer(direction-180) )){
+    	if (directions.size() == 0 && canMove( direction-180 )){
     		directions.add( dirStabilizer(direction-180) );
     		return directions;
     	}
@@ -145,9 +138,6 @@ public class Ghost extends Actor
     		random = 10;
     	}else{
     		random--;
-    		Location next = getLocation().getNeighbourLocation(direction);
-    		Location right = getLocation().getNeighbourLocation(direction+90);
-    		Location left = getLocation().getNeighbourLocation(direction-90);
     		ArrayList<Double> directions = getNextSteps();
     		int variants = directions.size();
     		int i = generator.nextInt(variants);
@@ -178,7 +168,12 @@ public class Ghost extends Actor
      * Toggle hunting/fleeing mode.
      */
     public void toggleHunting() {
-        // Toggle sprite
+    	//Change hunting/fleeing mode
+    	if (mode==0)
+    		mode = 180;
+    	else
+    		mode = 0;
+    	// Toggle sprite
         show(1 - getIdVisible());
     }
  
