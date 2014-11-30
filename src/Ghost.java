@@ -117,20 +117,20 @@ public class Ghost extends Actor
     
     private ArrayList<Double> getNextSteps(){
     	ArrayList<Double> directions = new ArrayList<Double>();
-    	if (canMove( direction) ){
-    		directions.add( dirStabilizer(direction) );
-    	}
-    	if (canMove(  direction+90) ){
-    		directions.add(dirStabilizer(direction+90));
-    	}
-    	if (canMove( direction-90) ){
-    		directions.add(dirStabilizer(direction-90));
-    	}
-    	if (directions.size() == 0 && canMove( direction-180 )){
-    		directions.add( dirStabilizer(direction-180) );
-    		return directions;
-    	}
-    	return directions;
+     	if (canMove(direction)){
+     		directions.add(direction);
+     	}
+     	if (canMove( dirStabilizer(direction+90) )){
+     		directions.add(dirStabilizer(direction+90));
+     	}
+     	if (canMove( dirStabilizer(direction-90) )){
+     		directions.add(dirStabilizer(direction-90));
+     	}
+     	if (directions.size() == 0 && canMove( dirStabilizer(direction-180) )){
+     		directions.add( dirStabilizer(direction-180) );
+     		return directions;
+     	}
+     	return directions;
     }
     
     private void goRandom(){
