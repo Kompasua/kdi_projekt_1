@@ -81,8 +81,6 @@ public class Ghost extends Actor
 		if (next != null && canMove(next) && random == 0) {
     		last = getLocation();
     		setLocation(next);
-    		//Actually must be the same, because we moving in the same direction. Delete after prove. 
-    		direction = last.getDirectionTo(getLocation()); 
     	    gameGrid.refresh();
     	}else{
         	goRandom();
@@ -107,6 +105,12 @@ public class Ghost extends Actor
     		makeStep(0);
     		return;
     	}
+    	if (canMove(direction)){
+    		makeStep(direction);
+    		return;
+    	}
+    	if (random == 0)
+	    	random = 1;
     	goRandom();
     }
         
