@@ -96,8 +96,8 @@ public class Ghost extends Actor
     		makeStep(0-mode);
     		return;
     	}
-    	if (canMove(direction-mode)){
-    		makeStep(direction-mode);
+    	if (canMove(direction)){
+    		makeStep(direction);
     		return;
     	}
     	if (random == 0)
