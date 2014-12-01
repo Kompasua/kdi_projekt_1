@@ -1,5 +1,9 @@
-// Ghost.java
-// Used for PaKman
+/**
+ * Ghost.java
+ * Used for PaKman
+ * @author Anton Bubnov
+ * @version 01.12.2014
+ */
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -20,8 +24,8 @@ public class Ghost extends Actor {
 	public Ghost(PaKman pakman) {
 		super(false, "sprites/ghost.gif", 2);
 		this.pakman = pakman;
-		Level level = pakman.getLevel(); //Current level to get size of maze
-		locsize = level.getSize();
+		Level level = pakman.getLevel(); //Get current level to get size of maze
+		locsize = level.getSize(); //Get size of level
 		reset();
 	}
 
@@ -65,7 +69,7 @@ public class Ghost extends Actor {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * If possible and if we must'nt make random step,
 	 * then make step in near location (by direction).
@@ -85,13 +89,13 @@ public class Ghost extends Actor {
 			goRandom();
 		}
 	}
-	
+
 	/**
-	 * Make next depending on pakman location (east,west,north, south). 
+	 * Make next step depending on pakman location (east,west,north, south). 
 	 * If pakman location is south-west, east-west and so on, then make
-	 * step in the same direction. 
-	 * If no one of described variants is possible, 
+	 * step in the same direction. If no one of described variants is possible, 
 	 * then make one random step.
+	 * Mode variable is used to reverse direction if in fleeing mode. 
 	 */
 	private void nextStep() {
 		//Direction to pakman location in this step.
@@ -125,7 +129,7 @@ public class Ghost extends Actor {
 		}
 		goRandom();
 	}
-	
+
 	/**
 	 * Stabilize direction of movement for Location class methods. 
 	 * Check if direction in range from 0 to 359.
@@ -184,38 +188,53 @@ public class Ghost extends Actor {
 		if (random == 0) {
 			random = 10;
 		} else {
-			random--;
+			random--; //Decrease random steps counter
 			//Get available for move directions.
 			ArrayList<Double> directions = getNextSteps();
 			//Store possible directions number.
 			int variants = directions.size();
 			Random generator = new Random();
-			int i = generator.nextInt(variants);
 			last = getLocation(); //Save current location.
 
 			//Choose random step move.
 			if (variants == 3) {
-				i = generator.nextInt(variants + 1);
+				/*
+				 * Generate random number in range from 0 to 
+				 * possible directions number plus one.
+				 * Plus one is used to increase chance of moving straight to 50%.
+				 */
+				int i = generator.nextInt(variants + 1);
 				switch (i) {
 				case 0:
+					//Second element from Array - right
 					setLocation(getLocation().getNeighbourLocation(
 							directions.get(1)));
 					break;
 				case 1:
+					//Third element from Array - left
 					setLocation(getLocation().getNeighbourLocation(
 							directions.get(2)));
 					break;
 				default:
+					//First element from Array - straight
 					setLocation(getLocation().getNeighbourLocation(
 							directions.get(0)));
 				}
 			} else {
+				/*
+				 * If we have only one possible direction, then go in it. 
+				 * If we have two, then generate random from 0 to 1 to make chance 
+				 * of right\left 50% respectively.
+				 */
+				int i = generator.nextInt(variants);
 				switch (i) {
 				case 0:
+					//First element from Array - right, if left if possible, else left.
 					setLocation(getLocation().getNeighbourLocation(
 							directions.get(0)));
 					break;
 				case 1:
+					//Second element from Array - left, if right if possible, else null.
 					setLocation(getLocation().getNeighbourLocation(
 							directions.get(1)));
 				}
