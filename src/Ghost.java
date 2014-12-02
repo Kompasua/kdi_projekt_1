@@ -53,11 +53,11 @@ public class Ghost extends Actor {
 	/**
 	 * Check if cell is available for move of ghost.
 	 * @param direction to near location where ghost would like to move
-	 * @return true if sell is PASSAGE, false if WALL
+	 * @return true if sell is PASSAGE, else false.
 	 */
 	private boolean canMove(double dir) {
 		Location location = getLocation().getNeighbourLocation(
-				dirStabilizer(dir));
+				stabilizeDir(dir));
 		// Check if this location not out of maze
 		if (location.getY() < locsize.getY()
 				&& location.getX() < locsize.getX() && location.getY() >= 0
@@ -73,14 +73,14 @@ public class Ghost extends Actor {
 	/**
 	 * If possible and if we must'nt make random step,
 	 * then make step in near location (by direction).
-	 * If move in this direction is impossible then call goRandom() method.
+	 * If movement in this direction is impossible then call goRandom() method.
 	 * @param _direction for next step of ghost
 	 */
 	private void makeStep(double _direction) {
 		//Location where ghost would like to move.
-		Location next = getLocation().getNeighbourLocation(dirStabilizer(_direction));
-		if (canMove(dirStabilizer(_direction)) && random == 0) {
-			last = getLocation();
+		Location next = getLocation().getNeighbourLocation(stabilizeDir(_direction));
+		if (canMove(stabilizeDir(_direction)) && random == 0) {
+			last = getLocation(); //Save current location
 			setLocation(next);
 			// Seems it the same, but it is not.
 			direction = last.getDirectionTo(getLocation());
@@ -91,7 +91,7 @@ public class Ghost extends Actor {
 	}
 
 	/**
-	 * Make next step depending on pakman location (east,west,north, south). 
+	 * Make next step depending on pakman location (east, west, north, south). 
 	 * If pakman location is south-west, east-west and so on, then make
 	 * step in the same direction. If no one of described variants is possible, 
 	 * then make one random step.
@@ -133,12 +133,12 @@ public class Ghost extends Actor {
 	/**
 	 * Stabilize direction of movement for Location class methods. 
 	 * Check if direction in range from 0 to 359.
-	 * When not, then change it so to be in this range.
+	 * If not, then change it so to be in this range.
 	 * Else return same direction.
 	 * @param direction of pakman movement (not stabilized)
 	 * @return direction of pakman movement (stabilized)
 	 */
-	private double dirStabilizer(double direction) {
+	private double stabilizeDir(double direction) {
 		if (direction < 0)
 			return 360 - direction * (-1);
 		if (direction == 360)
@@ -160,14 +160,14 @@ public class Ghost extends Actor {
 		if (canMove(direction)) {
 			directions.add(direction);
 		}
-		if (canMove(dirStabilizer(direction + 90))) {
-			directions.add(dirStabilizer(direction + 90));
+		if (canMove(stabilizeDir(direction + 90))) {
+			directions.add(stabilizeDir(direction + 90));
 		}
-		if (canMove(dirStabilizer(direction - 90))) {
-			directions.add(dirStabilizer(direction - 90));
+		if (canMove(stabilizeDir(direction - 90))) {
+			directions.add(stabilizeDir(direction - 90));
 		}
-		if (directions.size() == 0 && canMove(dirStabilizer(direction - 180))) {
-			directions.add(dirStabilizer(direction - 180));
+		if (directions.size() == 0 && canMove(stabilizeDir(direction - 180))) {
+			directions.add(stabilizeDir(direction - 180));
 			return directions;
 		}
 		return directions;
@@ -254,6 +254,8 @@ public class Ghost extends Actor {
 			mode = 180;
 		else
 			mode = 0;
+		//Cancel random mode.
+		random = 0;
 		// Toggle sprite
 		show(1 - getIdVisible());
 	}
