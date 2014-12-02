@@ -31,9 +31,12 @@ public class Ghost extends Actor {
 
 	/**
 	 * Called when the level is initialized or reset.
+	 * Set default values.
 	 */
 	public void reset() {
-
+		random = 0; //Discard random mode.
+		mode = 0; //Set hunting mode.
+		direction = 0; //Set default direction.
 	}
 
 	/**
