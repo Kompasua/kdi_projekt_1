@@ -28,6 +28,103 @@ public class Ghost extends Actor {
 		locsize = level.getSize(); //Get size of level
 		reset();
 	}
+	
+	/**
+	 * @return pakman
+	 */
+	public PaKman getPakman() {
+		return pakman;
+	}
+
+	/**
+	 * Set pakman. Pakman must not be NULL.
+	 * @param pakman 
+	 */
+	public void setPakman(PaKman pakman) {
+		if (pakman == null){
+			throw new IllegalArgumentException("Argument must not be NULL!");
+		}else{
+			this.pakman = pakman;
+		}
+	}
+
+	/**
+	 * @return last location of pakman
+	 */
+	public Location getLast() {
+		return last;
+	}
+
+	/**
+	 * Set last location.
+	 * Location must not be NULL.
+	 * @param last location
+	 */
+	public void setLast(Location last) {
+		if (last == null){
+			throw new IllegalArgumentException("Argument must not be NULL!");
+		}else{
+			this.last = last;
+		}
+	}
+
+	/**
+	 * @return current number of random steps.
+	 */
+	public int getRandom() {
+		return random;
+	}
+
+	/**
+	 * Set number of random steps.
+	 * Must be a positive integer or 0.
+	 * @param random
+	 */
+	public void setRandom(int random) {
+		if (random < 0){
+			throw new IllegalArgumentException("Argument must be positive or 0.");
+		}else{
+			this.random = random;
+		}
+	}
+
+	/**
+	 * @return current mode (0 for hunting, 180 for fleeing)
+	 */
+	public int getMode() {
+		return mode;
+	}
+
+	/**
+	 * Set hunting or fleeing mode
+	 * @param mode (should be 0 or 180)
+	 */
+	public void setMode(int mode) {
+		if (mode!= 0 || mode !=180){
+			throw new IllegalArgumentException("Argument must be 0 if hunting mode and "
+					+ "180 if fleeing mode.");
+		}else{
+			this.mode = mode;
+		}
+	}
+
+	/**
+	 * @return current direction of pakman movement
+	 */
+	public double getDirection() {
+		return direction;
+	}
+
+	/**
+	 * @param direction of pakman movement
+	 */
+	public void setDirection(double direction) {
+		if (direction > 360 || direction < 0 ){
+			throw new IllegalArgumentException("Argument must be [0,360)");
+		}else{
+			this.direction = direction;
+		}
+	}
 
 	/**
 	 * Called when the level is initialized or reset.
