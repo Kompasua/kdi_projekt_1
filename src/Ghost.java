@@ -1,8 +1,8 @@
 /**
  * Ghost.java
  * Used for PaKman
- * @author Anton Bubnov
- * @version 01.12.2014
+ * @author Anton Bubnov und Tony Stankov
+ * @version 03.12.2014
  */
 
 import java.util.ArrayList;
